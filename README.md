@@ -28,7 +28,8 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
        - CIDR: `10.0.2.0/24`
      - *Nota: Duas subnets privadas em AZs diferentes são necessárias para a alta disponibilidade do RDS.*
 
-![image](https://gist.github.com/user-attachments/assets/10731ab2-0b14-463c-812e-1e285f819968)
+![image](https://github.com/user-attachments/assets/875cbdbf-6f69-4792-adf4-d03fc5f11f83)
+
 
 #### **1.3. Criar Instância EC2 (Servidor da Aplicação):**
    - **Ação:** Lance uma nova instância EC2.
@@ -43,9 +44,9 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
          - Atribuir IP público automaticamente: `Enable`
          - Firewall (Security Groups): Crie um novo chamado `app01-sg` permitindo tráfego nas portas `22` (SSH) e `8080` (Aplicação).
 
-![image](https://gist.github.com/user-attachments/assets/bbc20244-d0bd-4ba1-b85a-af3749e61cb4)
+![image](https://github.com/user-attachments/assets/bbc20244-d0bd-4ba1-b85a-af3749e61cb4)
 
-![image](https://gist.github.com/user-attachments/assets/0f9b1cc5-1f85-4107-9c3a-c3ee8fc41944)
+![image](https://github.com/user-attachments/assets/0f9b1cc5-1f85-4107-9c3a-c3ee8fc41944)
 
 
 #### **1.4. Criar Banco de Dados RDS (MySQL):**
