@@ -90,7 +90,7 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
      - Nas Tabelas de Roteamento (Route Table) da sua VPC (a principal, ou a associada à subnet pública):
        - Edite as rotas.
        - Adicione uma rota: Destino `0.0.0.0/0`, Alvo (Target) `Internet Gateway (igw-use1)`.
-   - **Ação:** Tente conectar-se à instância EC2 via SSH a partir do Cloud9.
+   - **Ação:** Tente conectar-se à instância EC2 via SSH.
      - Comando: `ssh -i ssh-aws-minha-aplicacao.pem ubuntu@YOUR-EC2-PUBLIC-IP` (Substitua `YOUR-EC2-PUBLIC-IP` pelo IP público da sua EC2).
      - Se receber um aviso "UNPROTECTED PRIVATE KEY FILE!":
        - Solução: `chmod 400 ssh-aws-minha-aplicacao.pem`.
@@ -244,7 +244,7 @@ Obs: É no procotolo http não é https.
 ---
 
 ### **Limpeza dos Recursos (IMPORTANTE):**
-- **Ação:** Pare a instância Cloud9.
+- **Ação:** Pare a instância.
 - **Ação:** Exclua a instância RDS.
   - No console RDS, selecione a instância, clique em "Actions" > "Delete".
   - Desmarque a criação de snapshot final e a retenção de backups automáticos. Confirme a exclusão.
