@@ -2,6 +2,7 @@
 Tutorial de Migração: Aplicação On-Premise para AWS.
 
 
+
 ### **Parte 1: Implementação "Criação EC2 e RDS de acordo 'sizing'"**
 
 #### **1.1. Criar VPC e Subnets:**
@@ -27,6 +28,8 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
        - CIDR: `10.0.2.0/24`
      - *Nota: Duas subnets privadas em AZs diferentes são necessárias para a alta disponibilidade do RDS.*
 
+![image](https://gist.github.com/user-attachments/assets/10731ab2-0b14-463c-812e-1e285f819968)
+
 #### **1.3. Criar Instância EC2 (Servidor da Aplicação):**
    - **Ação:** Lance uma nova instância EC2.
      - **Configuração:**
@@ -39,6 +42,11 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
          - Subnet: `Public Subnet`
          - Atribuir IP público automaticamente: `Enable`
          - Firewall (Security Groups): Crie um novo chamado `app01-sg` permitindo tráfego nas portas `22` (SSH) e `8080` (Aplicação).
+
+![image](https://gist.github.com/user-attachments/assets/bbc20244-d0bd-4ba1-b85a-af3749e61cb4)
+
+![image](https://gist.github.com/user-attachments/assets/0f9b1cc5-1f85-4107-9c3a-c3ee8fc41944)
+
 
 #### **1.4. Criar Banco de Dados RDS (MySQL):**
    - **Ação:** Crie uma nova instância de banco de dados RDS.
@@ -56,36 +64,37 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
          - Zona de Disponibilidade (AZ): `us-east-1a`.
          - Porta do Banco de Dados: `3306` (verifique em "Additional configuration").
 
+![image](https://gist.github.com/user-attachments/assets/6e14ebe5-631f-47bf-bf28-847efcd763aa)
+
 ---
 
 ### **Parte 2: Instalação e Configuração dos Pacotes para App e Conexão com o BD**
 
-#### **2.1. Criar e Configurar Instância Cloud9 (Ambiente de Desenvolvimento):**
-   - **Ação:** Crie uma instância Cloud9.
-     - Nome: `aws-minha-aplicacao`.
-   - **Ação:** Redimensione o volume EBS da instância Cloud9 para `30 GB`.
+#### **2.1. Configurar Instância (Ambiente de Desenvolvimento):**
+   - **Ação:** Redimensione o volume EBS da instância para `30 GB`.
      - Verifique o tamanho atual: `df -kh` e `lsblk`.
-     - Acesse o console EC2, encontre o volume EBS da instância Cloud9 e modifique seu tamanho para `30 GB`.
-     - Verifique novamente: `df -kh` e `lsblk`. Se não atualizado, reinicie a instância Cloud9: `sudo reboot`.
+     - Acesse o console EC2, encontre o volume EBS da instância e modifique seu tamanho para `30 GB`.
+     - Verifique novamente: `df -kh` e `lsblk`. Se não atualizado, reinicie a instância: `sudo reboot`.
 
 #### **2.2. Preparar Conexão com a Instância EC2:**
-   - **Ação:** No terminal do Cloud9, faça upload do arquivo da chave `ssh-aws-minha-aplicacao.pem`.
+   - **Ação:** No terminal cloud shell, faça upload do arquivo da chave `ssh-aws-minha-aplicacao.pem`.
    - **Ação:** Crie um Internet Gateway (IGW) e configure o roteamento.
      - No console VPC, crie um Internet Gateway:
-       - Nome: `igw-mod3`.
+       - Nome: `igw-use1`.
        - Anexe-o à VPC `vpc-minha-aplicacao`.
      - Nas Tabelas de Roteamento (Route Table) da sua VPC (a principal, ou a associada à subnet pública):
        - Edite as rotas.
-       - Adicione uma rota: Destino `0.0.0.0/0`, Alvo (Target) `Internet Gateway (igw-mod3)`.
+       - Adicione uma rota: Destino `0.0.0.0/0`, Alvo (Target) `Internet Gateway (igw-use1)`.
    - **Ação:** Tente conectar-se à instância EC2 via SSH a partir do Cloud9.
      - Comando: `ssh -i ssh-aws-minha-aplicacao.pem ubuntu@YOUR-EC2-PUBLIC-IP` (Substitua `YOUR-EC2-PUBLIC-IP` pelo IP público da sua EC2).
      - Se receber um aviso "UNPROTECTED PRIVATE KEY FILE!":
        - Solução: `chmod 400 ssh-aws-minha-aplicacao.pem`.
 
+![image](https://gist.github.com/user-attachments/assets/e6302b04-4ff8-4606-a8c7-8eb01a010663)
+
+
 #### **2.3. Instalar Aplicação e Suas Dependências na Instância EC2:**
-   - **Ação:** Uma vez conectado à EC2, configure o `needrestart` para evitar interrupções.
-     - Comando: `sudo sed -i "/#\$nrconf{restart} = 'i';/s/.*/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf`
-     - Verifique: `cat /etc/needrestart/needrestart.conf | grep -i nrconf{restart}` (deve mostrar `$nrconf{restart} = 'a';`).
+  
    - **Ação:** Instale os pacotes e bibliotecas necessários.
      ```bash
      sudo apt update
@@ -96,11 +105,14 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
      sudo apt install unzip -y
      sudo apt install libpq-dev libxml2-dev libxslt1-dev libldap2-dev -y
      sudo apt install libsasl2-dev libffi-dev -y
+     sudo apt install python3.12-venv
+     python3 -m venv .wiki
+     source .wiki/bin/activate
      pip install Flask==2.3.3
      export PATH=$PATH:/home/ubuntu/.local/bin/ # Adicione ao seu .bashrc para persistência
      pip3 install wtforms
      sudo apt install pkg-config
-     pip3 install flask_mysqldb
+     python -m pip install Flask-MySQLdb==0.2.0
      pip3 install passlib
      ```
    - **Ação:** Instale o MySQL Client na EC2.
@@ -109,6 +121,9 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
      ```
 
 ---
+
+![image](https://gist.github.com/user-attachments/assets/8d793362-9ac6-4dcd-9405-df678615a1af)
+
 
 ### **Parte 3: Go Live**
 
@@ -125,12 +140,15 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
      - No console RDS, selecione a instância `awsuse1db01` e clique em "Modify".
      - Na seção "Connectivity", adicione o `EC2toRDS-sg` e remova o `default` (se ainda estiver lá).
      - Continue e aplique as modificações imediatamente ("Apply immediately").
+     
+![image](https://gist.github.com/user-attachments/assets/4e8597d0-a2f3-4e4c-8de4-d2f9437d9b02)
+
 
 #### **3.2. Fazer Download dos Arquivos da Aplicação e Dump do Banco de Dados na EC2:**
    - **Ação:** Conectado à sua instância EC2 via SSH.
      ```bash
-     wget https://github.com/phillrog/migracao-onpremise-aws/blob/main/files/wikiapp.zip
-     wget https://github.com/phillrog/migracao-onpremise-aws/blob/main/files/dump.sql
+     wget https://github.com/phillrog/migracao-onpremise-aws/raw/refs/heads/main/files/wikiapp.zip
+     wget https://raw.githubusercontent.com/phillrog/migracao-onpremise-aws/refs/heads/main/files/dump.sql
      ```
 
 #### **3.3. Conectar ao Servidor MySQL no RDS e Importar Dados:**
@@ -138,7 +156,7 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
    - **Ação:** Conecte-se ao RDS a partir da EC2.
      ```bash
      mysql -h <endpoint_do_rds> -P 3306 -u admin -p
-     # Exemplo: mysql -h awsuse1db01.culdx6558fqq.us-east-1.rds.amazonaws.com -P 3306 -u admin -p
+     # Exemplo: mysql -h awsuse1db01.c49c0kiwyqwt.us-east-1.rds.amazonaws.com -P 3306 -u admin -p
      ```
      - Senha: `admin123456`.
    - **Ação:** Dentro do prompt do MySQL, crie o banco de dados e importe o dump.
@@ -148,9 +166,15 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
      SHOW DATABASES;
      USE wikidb;
      SHOW TABLES;
-     SOURCE dump.sql;
+     SOURCE /home/ubuntu/dump.sql;
      SHOW TABLES;
      SELECT * FROM articles;
+     ```
+     ou 
+     ```
+     SHOW TABLES;
+      mysql -h awsuse1db01.c49c0kiwyqwt.us-east-1.rds.amazonaws.com -P 3306 -u  admin -p wikidb < dump.sql 
+     SHOW TABLES;
      ```
    - **Ação:** Crie um usuário específico para a aplicação no banco de dados.
      ```sql
@@ -159,6 +183,12 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
      FLUSH PRIVILEGES;
      EXIT;
      ```
+     - mysql -h endpoint_do_banco -P 3306 -u  admin -p
+     
+![image](https://gist.github.com/user-attachments/assets/90adc008-960e-4502-8ab1-faf2eb375cfa)
+
+![image](https://gist.github.com/user-attachments/assets/3baa89d7-8cf6-4331-b0b7-ca9d5026a213)
+
 
 #### **3.4. Configurar e Executar a Aplicação:**
    - **Ação:** Descompacte os arquivos da aplicação.
@@ -172,13 +202,17 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
      ```
      - Pressione `INSERT` para editar.
      - Na seção `# Config MySQL`:
-       - Altere `MYSQL_HOST` para o endpoint do seu RDS (ex: `'awsuse1db01.cfhprbugweo6.us-east-1.rds.amazonaws.com'`).
+       - Altere `MYSQL_HOST` para o endpoint do seu RDS (ex: `'awsuse1db01.c49c0kiwyqwt.us-east-1.rds.amazonaws.com'`).
        - Altere `MYSQL_USER` para `'wiki'`.
      - Pressione `ESC`, depois digite `:x` e pressione Enter para salvar e sair.
    - **Ação:** Execute a aplicação.
      ```bash
      python3 wiki.py
      ```
+![image](https://gist.github.com/user-attachments/assets/b44cedb8-244c-44f2-a62e-fe9198560276)
+
+![image](https://gist.github.com/user-attachments/assets/88a249f5-4868-41fb-977a-daa5440d2d42)
+
 
 #### **3.5. Validar a Migração:**
    - **Ação:** Abra um navegador e acesse `http://<IP_PUBLICO_EC2>:8080`.
@@ -186,6 +220,10 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
    - **Ação:** Crie um novo artigo com seu nome como evidência.
 
 ---
+Obs: É no procotolo http não é https.
+
+![image](https://gist.github.com/user-attachments/assets/76238603-3531-41b9-9c30-7a9989d19301)
+
 
 ### **Pós Go Live!**
 - **Ação:** Monitore a estabilização da aplicação.
@@ -202,3 +240,9 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
   - No console EC2, selecione a instância, clique em "Instance state" > "Terminate".
 
 ---
+
+## **Resultado da migração**
+
+![image](https://gist.github.com/user-attachments/assets/9cf3de95-e832-43fe-b5ab-5cd2a6198653)
+
+![image](https://gist.github.com/user-attachments/assets/daded9cf-804a-45f9-a968-7d44eaa0216b)
