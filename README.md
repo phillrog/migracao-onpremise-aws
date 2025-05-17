@@ -28,7 +28,8 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
        - CIDR: `10.0.2.0/24`
      - *Nota: Duas subnets privadas em AZs diferentes são necessárias para a alta disponibilidade do RDS.*
 
-![image](https://github.com/user-attachments/assets/875cbdbf-6f69-4792-adf4-d03fc5f11f83)
+![image](https://github.com/user-attachments/assets/ddc11398-5923-4817-b86c-3a4d61314d4b)
+
 
 
 #### **1.3. Criar Instância EC2 (Servidor da Aplicação):**
@@ -44,9 +45,11 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
          - Atribuir IP público automaticamente: `Enable`
          - Firewall (Security Groups): Crie um novo chamado `app01-sg` permitindo tráfego nas portas `22` (SSH) e `8080` (Aplicação).
 
-![image](https://github.com/user-attachments/assets/bbc20244-d0bd-4ba1-b85a-af3749e61cb4)
+![image](https://github.com/user-attachments/assets/80ad76bd-dc30-4173-b475-7132f510ced2)
 
-![image](https://github.com/user-attachments/assets/0f9b1cc5-1f85-4107-9c3a-c3ee8fc41944)
+
+![image](https://github.com/user-attachments/assets/2aa30fbc-9c0c-45a4-81be-c983cd9c8a82)
+
 
 
 #### **1.4. Criar Banco de Dados RDS (MySQL):**
@@ -65,7 +68,8 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
          - Zona de Disponibilidade (AZ): `us-east-1a`.
          - Porta do Banco de Dados: `3306` (verifique em "Additional configuration").
 
-![image](https://gist.github.com/user-attachments/assets/6e14ebe5-631f-47bf-bf28-847efcd763aa)
+![image](https://github.com/user-attachments/assets/5ad350e2-ad02-4f68-9d5c-5562f42590da)
+
 
 ---
 
@@ -91,7 +95,8 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
      - Se receber um aviso "UNPROTECTED PRIVATE KEY FILE!":
        - Solução: `chmod 400 ssh-aws-minha-aplicacao.pem`.
 
-![image](https://gist.github.com/user-attachments/assets/e6302b04-4ff8-4606-a8c7-8eb01a010663)
+![image](https://github.com/user-attachments/assets/de86740f-9265-4cf0-9785-55e74463c7e8)
+
 
 
 #### **2.3. Instalar Aplicação e Suas Dependências na Instância EC2:**
@@ -123,7 +128,8 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
 
 ---
 
-![image](https://gist.github.com/user-attachments/assets/8d793362-9ac6-4dcd-9405-df678615a1af)
+![image](https://github.com/user-attachments/assets/17f6b3ee-65da-403f-8e10-8906e5eec1af)
+
 
 
 ### **Parte 3: Go Live**
@@ -142,7 +148,8 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
      - Na seção "Connectivity", adicione o `EC2toRDS-sg` e remova o `default` (se ainda estiver lá).
      - Continue e aplique as modificações imediatamente ("Apply immediately").
      
-![image](https://gist.github.com/user-attachments/assets/4e8597d0-a2f3-4e4c-8de4-d2f9437d9b02)
+![image](https://github.com/user-attachments/assets/39be585e-763c-406a-a43a-e0b04def1118)
+
 
 
 #### **3.2. Fazer Download dos Arquivos da Aplicação e Dump do Banco de Dados na EC2:**
@@ -186,9 +193,11 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
      ```
      - mysql -h endpoint_do_banco -P 3306 -u  admin -p
      
-![image](https://gist.github.com/user-attachments/assets/90adc008-960e-4502-8ab1-faf2eb375cfa)
+![image](https://github.com/user-attachments/assets/fbfd9019-5979-4c52-b3f8-63e4fc2d4a4e)
 
-![image](https://gist.github.com/user-attachments/assets/3baa89d7-8cf6-4331-b0b7-ca9d5026a213)
+
+![image](https://github.com/user-attachments/assets/ac6d2f70-ab53-4359-96bd-efd2121411b4)
+
 
 
 #### **3.4. Configurar e Executar a Aplicação:**
@@ -210,9 +219,11 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
      ```bash
      python3 wiki.py
      ```
-![image](https://gist.github.com/user-attachments/assets/b44cedb8-244c-44f2-a62e-fe9198560276)
+![image](https://github.com/user-attachments/assets/e29fb3f4-9de4-4dee-976b-383b67719e2d)
 
-![image](https://gist.github.com/user-attachments/assets/88a249f5-4868-41fb-977a-daa5440d2d42)
+
+![image](https://github.com/user-attachments/assets/5d139a74-ec8e-4305-b566-f77bc65278a7)
+
 
 
 #### **3.5. Validar a Migração:**
@@ -223,7 +234,7 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
 ---
 Obs: É no procotolo http não é https.
 
-![image](https://gist.github.com/user-attachments/assets/76238603-3531-41b9-9c30-7a9989d19301)
+![image](https://github.com/user-attachments/assets/7fbad868-31b2-4c26-bdf7-2c317996cb88)
 
 
 ### **Pós Go Live!**
@@ -244,6 +255,8 @@ Obs: É no procotolo http não é https.
 
 ## **Resultado da migração**
 
-![image](https://gist.github.com/user-attachments/assets/9cf3de95-e832-43fe-b5ab-5cd2a6198653)
+![image](https://github.com/user-attachments/assets/0fc7bd3d-8edc-43e6-84cf-3adbdfb8930b)
 
-![image](https://gist.github.com/user-attachments/assets/daded9cf-804a-45f9-a968-7d44eaa0216b)
+
+![image](https://github.com/user-attachments/assets/fd6d9fdb-ab9c-4a11-9621-7e0742a59950)
+
