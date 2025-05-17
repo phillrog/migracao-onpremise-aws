@@ -129,8 +129,8 @@ Tutorial de Migração: Aplicação On-Premise para AWS.
 #### **3.2. Fazer Download dos Arquivos da Aplicação e Dump do Banco de Dados na EC2:**
    - **Ação:** Conectado à sua instância EC2 via SSH.
      ```bash
-     wget [https://github.com/phillrog/migracao-onpremise-aws/blob/main/files/wikiapp.zip](https://github.com/phillrog/migracao-onpremise-aws/blob/main/files/wikiapp.zip)
-     wget [https://github.com/phillrog/migracao-onpremise-aws/blob/main/files/dump.sql](https://github.com/phillrog/migracao-onpremise-aws/blob/main/files/dump.sql)
+     wget https://github.com/phillrog/migracao-onpremise-aws/blob/main/files/wikiapp.zip
+     wget https://github.com/phillrog/migracao-onpremise-aws/blob/main/files/dump.sql
      ```
 
 #### **3.3. Conectar ao Servidor MySQL no RDS e Importar Dados:**
